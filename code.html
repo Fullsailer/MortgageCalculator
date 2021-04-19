@@ -1,0 +1,164 @@
+﻿﻿<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Mortgage Calculator</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Favicons -->
+    <link href="/img/favicon.ico" rel="icon">
+    <link href="/img/John Image.jpg" rel="john-image">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- Sticky footer CSS -->
+    <link rel="stylesheet" href="./css/site.css">
+
+    <!-- Prism Okaidia-->
+    <link rel="stylesheet" href="/css/prismOkaidia.css">
+</head>
+
+<body>
+
+    <header>
+        <!-- Fixed navbar -->
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+            <a class="navbar-brand" id="logo" href="index.html">Mortgage Calculator</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item ">
+                        <a class="nav-link" href="index.html">💰Home </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="app.html">💰App <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="code.html">💰Code</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="about.html">💰About The Developer <span class="sr-only">(current)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" target="_blank" href="https://johnbishopflynn.netlify.app/">💰Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" target="_blank" href="https://github.com/Fullsailer">💰Github</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <main role="main">
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col">
+                    <h1 class="mt-5">Code Breakdown</h1>
+                    <p>function calculateLoan</p>
+                    <p>for (let i = 0; i < months; i++)</p> <p>for (let i = 0; i < months; i++) { tBody +=`<tr>
+                                <td>${ i+1 }</td>
+                    </p>
+                    <p></p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <pre class="line-numbers language-javascript"><code class="language-javascript">
+
+function calculateLoan(){
+    let loanAmount = parseInt( document.getElementById("loanAmount").value )
+    let months = parseInt( document.getElementById("months").value )    
+
+    //before the very first month
+    let remainingBalance = [loanAmount]
+
+    let interestRate = parseFloat( document.getElementById("interestRate").value )
+
+    //Keep track of interest payments 
+    let interest = new Array()
+
+    //Keep track of principal payments
+    let principalPayments = new Array()
+
+    //keep track of total interest
+    let totalInterest = new Array()
+    totalInterest.push(0);
+
+    //Total Monthly Payment                                                          
+    let totalMonthlyPayment = (loanAmount) * (interestRate/1200) / (1 -   Math.pow( (1 + interestRate/1200) , (-months) ) )
+
+
+    
+    //loop iterate input in month user declares 
+    for (let i = 0; i < months; i++) {
+        //Interest 
+        interest.push(  (remainingBalance[i]) * (interestRate/1200)  ) 
+
+        //principal payment
+        principalPayments.push(  totalMonthlyPayment - interest[i]  ) 
+
+        //totalInterest
+        totalInterest.push( totalInterest[i] + ( (totalMonthlyPayment) - (principalPayments[i]) ) )
+        
+        remainingBalance.push( remainingBalance[i] - principalPayments[i] )        
+    }
+
+    // User data input to table
+    let tBody ="";
+    for (let i = 0; i < months; i++) {
+        tBody += `<tr> <td>${ i+1 }</td>                                                                    
+                        <td>$${  (Math.round(totalMonthlyPayment * 100) / 100).toFixed(2) }</td>             
+                        <td>$${  (Math.round(principalPayments[i] * 100) / 100).toFixed(2)   }</td>          
+                        <td>$${  (Math.round(interest[i] * 100) / 100).toFixed(2) }</td> 
+                        <td>$${  (Math.round(totalInterest[i+1] * 100) / 100).toFixed(2)   }</td>
+                        <td>$${  (Math.round(remainingBalance[i+1] * 100) / 100).toFixed(2)   }</td>
+                    </tr>` 
+    }
+    document.getElementById("tBody").innerHTML = tBody
+
+    //Monthly Payment
+    document.getElementById("monthlyPayment").innerHTML = `$${ (Math.round( totalMonthlyPayment *100)/100).toFixed(2)}`
+
+    //Outputs
+    document.getElementById("totalPrincipalOutput").innerHTML = `$${(Math.round(  loanAmount  *100)/100).toFixed(2)}`
+    document.getElementById("totalInterestOutput").innerHTML = `$${(Math.round(  totalInterest[months]  *100)/100).toFixed(2)}`
+    document.getElementById("totalCostOutput").innerHTML = `$${(Math.round( (loanAmount + totalInterest[months])  *100)/100).toFixed(2)}`
+}
+
+                        </code>
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container text-right">
+            <span class="text-muted">&copy; Copyright John Flynn 2021</span>
+        </div>
+    </footer>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
+
+    <!-- Prism -->
+    <script src="/js/prismOkaidia.js"></script>
+</body>
+
+</html>
