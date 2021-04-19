@@ -16,7 +16,7 @@
 
 <body>
 
-    <nav class="navbar navbar-expand-sm navbar-dark" style="background-color: green;">
+    <nav class="navbar navbar-expand-sm navbar-dark" style="background-color: #008000;">
         <a class="navbar-brand" href="index.html">Mortgage Calculator</a>
         <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId"
             aria-controls="collapsibleNavId" aria-expanded="false" aria-label="Toggle navigation"></button>
@@ -38,7 +38,8 @@
                     <a class="nav-link" target="_blank" href="https://johnbishopflynn.netlify.app/">💰Portfolio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" target="_blank" href="https://github.com/Fullsailer">💰Github</a>
+                    <a class="nav-link" target="_blank"
+                        href="https://github.com/Fullsailer/MortgageCalculator">💰Github</a>
                 </li>
             </ul>
         </div>
@@ -61,7 +62,7 @@
                         <label for="Loan Amount">Loan Amount($)</label>
                     </div>
                     <div class="col-5 ml-3">
-                        <input type="number" class="form-control" id="loanAmount" placeholder="100000">
+                        <input type="number" class="form-control" id="lamount" placeholder="100000">
                     </div>
                 </div>
                 <div class="row">
@@ -69,7 +70,7 @@
                         <label for="Term">Months</label>
                     </div>
                     <div class="col-5 ml-3">
-                        <input type="number" class="form-control" id="months" placeholder="60">
+                        <input type="number" class="form-control" id="lterm" placeholder="60">
                     </div>
                 </div>
                 <div class="row">
@@ -77,12 +78,12 @@
                         <label for="Interest Rate">Interest Rate</label>
                     </div>
                     <div class="col-5 ml-3">
-                        <input type="number" class="form-control" id="interestRate" placeholder="3.5%">
+                        <input type="number" class="form-control" id="lrate" placeholder="3.5%">
                     </div>
                 </div>
                 <div class="row offset-7 mt-4">
                     <button class="btn" type="submit" style="background-color: green; color:white;"
-                        onclick="calculateLoan()">Calculate</button>
+                        onclick="buildSchedule()">Calculate</button>
                 </div>
             </div>
             <!--INPUTS COLUMN-->
@@ -95,7 +96,7 @@
                 </div>
 
                 <div class="row justify-content-center mt-3">
-                    <h2 id="monthlyPayment">$0.00</h2>
+                    <h2 id="payment">$0.00</h2>
                 </div>
 
 
@@ -106,7 +107,7 @@
                         <h5>Total Principal</h5>
                     </div>
                     <div class="col-3 offset-6">
-                        <h5 id="totalPrincipalOutput" class="text-right">$0.00</h5>
+                        <h5 id="totalPrincipal" class="text-right">$0.00</h5>
                     </div>
                     <!--TOTALPRINCIPAL-->
 
@@ -116,7 +117,7 @@
                         <h5>Total Interest</h5>
                     </div>
                     <div class="col-3 offset-6">
-                        <h5 id="totalInterestOutput" class="text-right">$0.00</h5>
+                        <h5 id="totalInterest" class="text-right">$0.00</h5>
                     </div>
                     <!--TOTALINTEREST-->
 
@@ -125,7 +126,7 @@
                         <h5>Total Cost</h5>
                     </div>
                     <div class="col-3 offset-6">
-                        <h5 id="totalCostOutput" class="text-right">$0.00</h5>
+                        <h5 id="totalCost" class="text-right">$0.00</h5>
                     </div>
                     <!--TOTALCOST-->
 
@@ -134,52 +135,60 @@
 
             </div>
             <!--OUTPUTS COLUMN-->
+            <div class="container">
+                <div class="row">
+                    <table class="table table-striped"
+                        style="border-style:groove; border-width: 1px; border-radius:4px;border-top-style: none;">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Payment</th>
+                                <th>Principal</th>
+                                <th>Interest</th>
+                                <th>Total Interest</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleBody">
 
-        </div>
-    </div>
-
-
-    <div class="container">
-        <div class="row">
-            <table class="table table-striped"
-                style="border-style:groove; border-width: 1px; border-radius:4px;border-top-style: none;">
-                <thead>
-                    <tr>
-                        <th>Month</th>
-                        <th>Payment</th>
-                        <th>Principal</th>
-                        <th>Interest</th>
-                        <th>Total Interest</th>
-                        <th>Balance</th>
-                    </tr>
-                </thead>
-                <tbody id="tBody">
-
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-
-    <footer class="footer">
-        <div class="container text-right">
-            <span class="text-muted">&copy; Copyright John Flynn 2021</span>
-        </div>
-    </footer>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <template id="scheduleTemplate">
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </template>
 
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
-    </script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
-    </script>
-    <script src="js/site.js"></script>
+            <footer class="footer">
+                <div class="container text-right">
+                    <span class="text-muted">&copy; Copyright John Flynn 2021</span>
+                </div>
+            </footer>
+
+
+            <!-- Optional JavaScript -->
+            <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+                integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+                crossorigin="anonymous">
+            </script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+                integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+                crossorigin="anonymous">
+            </script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+                integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+                crossorigin="anonymous">
+            </script>
+            <script src="js/site.js"></script>
 
 </body>
 
