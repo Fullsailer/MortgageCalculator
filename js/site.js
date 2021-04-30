@@ -1,57 +1,142 @@
-function calculateLoan() {
-    let loanAmount = parseInt(document.getElementById("loanAmount").value)
-    let months = parseInt(document.getElementById("months").value)
+//Calculate the payment for the loan
+function calcPayment(amount, rate, term) {
+    return (amount * rate) / (1 - Math.pow(1 + rate, -term));
+}
 
-    //before the very first month
-    let remainingBalance = [loanAmount]
+//calculate the interst for the current balance of the loan
+function calcInterest(balance, rate) {
+    return balance * rate;
+}
+//Build Payment Schedule
+function buildSchedule() {
+    let loanAmount = Number(document.getElementById("lamount").value);
+    let rate = parseFloat(document.getElementById("lrate").value);
 
-    let interestRate = parseFloat(document.getElementById("interestRate").value)
+    //convert rate to a monthly interest rate
+    rate = rate / 1200;
 
-    //Keep track of interest payments 
-    let interest = new Array()
+    //Assume monthly input
+    let term = parseInt(document.getElementById("lterm").value);
+    let payment = calcPayment(loanAmount, rate, term);
+    let payments = getPayments(loanAmount, rate, term, payment);
 
-    //Keep track of principal payments
-    let principalPayments = new Array()
+    //pass the array to the display function
+    displayData(payments);
+}
 
-    //keep track of total interest
-    let totalInterest = new Array()
-    totalInterest.push(0);
+//Build the amoritization schedule
+function getPayments(amount, rate, term, payment) {
+    //setup an array to hold payments;
+    //this will hold an array of objects
+    let payments = [];
 
-    //Total Monthly Payment                                                          
-    let totalMonthlyPayment = (loanAmount) * (interestRate / 1200) / (1 - Math.pow((1 + interestRate / 1200), (-months)))
+    //setup some variables to hold the value in the schedule
 
-    //loop iterate user data in months 
-    for (let i = 0; i < months; i++) {
-        //Interest 
-        interest.push((remainingBalance[i]) * (interestRate / 1200))
+    let balance = amount;
+    let totalInterest = 0;
+    let monthlyPrincipal = 0;
+    let monthlyInterest = 0;
+    let monthlyTotalInterest = 0;
 
-        //principal payment
-        principalPayments.push(totalMonthlyPayment - interest[i])
+    //create a loop for each month of the loan term
+    for (month = 1; month <= term; month++) {
+        //Calculate the payment and interest
+        monthlyInterest = calcInterest(balance, rate);
+        totalInterest += monthlyInterest;
+        monthlyPrincipal = payment - monthlyInterest;
+        balance = balance - monthlyPrincipal;
 
-        //totalInterest
-        totalInterest.push(totalInterest[i] + ((totalMonthlyPayment) - (principalPayments[i])))
+        //add the details to an object
+        let curPayment = {
+            month: month,
+            payment: payment,
+            principal: monthlyPrincipal,
+            interest: monthlyInterest,
+            totalInterest: totalInterest,
+            balance: balance
+        }
 
-        remainingBalance.push(remainingBalance[i] - principalPayments[i])
+        payments.push(curPayment);
+
     }
 
-    //Input user data into the table
-    let tBody = "";
-    for (let i = 0; i < months; i++) {
-        tBody += `<tr> <td>${ i+1 }</td>                                                                    
-                       <td>$${  ((totalMonthlyPayment * 100) / 100).toFixed(2) }</td>             
-                       <td>$${  ((principalPayments[i] * 100) / 100).toFixed(2)   }</td>          
-                       <td>$${  ((interest[i] * 100) / 100).toFixed(2) }</td> 
-                       <td>$${  ((totalInterest[i+1] * 100) / 100).toFixed(2)   }</td>
-                       <td>$${  ((remainingBalance[i+1] * 100) / 100).toFixed(2)   }</td>
-                 </tr>`
+    let summary = {
+        payment: payment,
+        totalPrincipal: amount,
+        totalInterest: totalInterest,
+        totalCost: (amount + totalInterest)
     }
-    document.getElementById("tBody").innerHTML = tBody
 
-    //Monthly Payment
-    document.getElementById("monthlyPayment").innerHTML = `$${ (( totalMonthlyPayment *100)/100).toFixed(2)}`
+    payments.push(summary);
 
-    //Bottom three outputs
-    document.getElementById("totalPrincipalOutput").innerHTML = `$${((  loanAmount  *100)/100).toFixed(2)}`
-    document.getElementById("totalInterestOutput").innerHTML = `$${((  totalInterest[months]  *100)/100).toFixed(2)}`
-    document.getElementById("totalCostOutput").innerHTML = `$${(( (loanAmount + totalInterest[months])  *100)/100).toFixed(2)}`
+    return payments;
+
+}
+
+//display the data to the user
+function displayData(payments) {
+    //get the table we are going to add to.
+    let tableBody = document.getElementById("scheduleBody");
+    let template = document.getElementById("scheduleTemplate");
+
+    //clear the table for previous calculations
+    tableBody.innerHTML = "";
+
+    for (let i = 0; i < payments.length - 1; i++) {
+        //get a clone row template
+        payRow = template.content.cloneNode(true);
+        //grab only the columns in the template
+        paycols = payRow.querySelectorAll("td");
+
+        //build the row
+        //we know that there are six columns in our template
+        paycols[0].textContent = payments[i].month;
+        paycols[1].textContent = payments[i].payment.toFixed(2);
+        paycols[2].textContent = payments[i].principal.toFixed(2);
+        paycols[3].textContent = payments[i].interest.toFixed(2);
+        paycols[4].textContent = payments[i].totalInterest.toFixed(2);
+        paycols[5].textContent = payments[i].balance.toFixed(2);
+
+        //append to the table
+        tableBody.appendChild(payRow);
+    }
+
+    //total interest is in the last row of the payments array.
+    let totalInterest = payments[payments.length - 1].totalInterest;
+    //calculate total cost   
+    //    payment: payment,
+    //    totalPrincipal: amount,
+    //    totalInterest: totalInterest,
+    //    totalCost: (amount + totalInterest)
+
+    let payment = payments[payments.length - 1].payment;
+    let loanAmount = payments[payments.length - 1].loanAmount;
+    let totalCost = payments[payments.length - 1].totalCost;
+
+    //Build out the summary area
+    let labelPrincipal = document.getElementById("totalPrincipal");
+    labelPrincipal.innerHTML = Number(loanAmount).toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+    });
+
+    let labelInterest = document.getElementById("totalInterest");
+    labelInterest.innerHTML = Number(totalInterest).toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+    });
+
+    let paymentdiv = document.getElementById("payment");
+    paymentdiv.innerHTML = Number(payment).toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+    });
+
+    let totalCostDiv = document.getElementById("totalCost");
+
+    totalCostDiv.innerHTML = Number(totalCost).toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+    });
+
 }
